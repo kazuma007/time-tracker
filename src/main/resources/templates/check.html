@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="description" content="">
+<meta name="author" content="">
+<title>Time Tracker</title>
+<!-- Bootstrap core CSS -->
+<link href="vendor/bootstrap/css/bootstrap.min.css"
+	th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+<!-- Custom styles for this template -->
+<link href="css/small-business.css" th:href="@{/css/small-business.css}"
+	rel="stylesheet">
+<link href="css/styles.css" th:href="@{/css/styles.css}"
+	rel="stylesheet">
+<link href="https://use.fontawesome.com/releases/v5.6.1/css/all.css"
+	rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+	integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+	crossorigin="anonymous"></script>
+<link rel="stylesheet"
+	href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+<script type="text/javascript" th:inline="javascript">
+	let taskNameList = document.getElementsByClassName('taskName');	
+	console.log(taskNameList);
+</script>
+</head>
+
+<body>
+	<!-- Navigation -->
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+		<div class="container">
+			<a class="navbar-brand" href="#" th:href="@{/}">Time Tracker</a>
+			<button class="navbar-toggler" type="button" data-toggle="collapse"
+				data-target="#navbarResponsive" aria-controls="navbarResponsive"
+				aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarResponsive">
+				<ul class="navbar-nav ml-auto">
+					<li class="nav-item"><a class="nav-link" href="#"
+						th:href="@{/}">プロジェクト </a></li>
+					<li class="nav-item"><a class="nav-link" href="#"
+						th:href="@{/task}">工数入力
+					</a></li>
+					<li class="nav-item active"><a class="nav-link" href="#"
+						th:href="@{/check}">工数確認
+					<span class="sr-only">(current)</span>
+					</a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+	<!-- Page Content -->
+	<div class="container">
+		<div class="add-task-button-area check-form-area">
+			<form th:action="@{/checkTask}" method="post" th:object="${checkTaskForm}">
+				<div class="form-row align-items-center">
+					<div class="col-auto">
+						<label class="sr-only" for="inlineFormInput">担当者名</label> <input
+							type="text" class="form-control mb-2" name="userName" th:field="*{userName}" 
+							id="inlineFormInput" placeholder="担当者名">
+					</div>
+					<div class="col-auto">
+						<label class="sr-only" for="inlineFormInput">開始日</label> <input
+							type="text" class="form-control mb-2" name="startDate" th:field="*{startDate}" 
+							id="startDate" placeholder="開始日">
+					</div>
+					<div class="col-auto">
+						<label class="sr-only" for="inlineFormInput">終了日</label> <input
+							type="text" class="form-control mb-2" name="endDate" id="endDate" th:field="*{endDate}" 
+							placeholder="終了日">
+					</div>
+
+					<div class="col-auto">
+						<button type="submit" class="btn btn-primary mb-2">閲覧</button>
+					</div>
+				</div>
+			</form>
+			<p><code>※if(!(担当者を入力)) return 各メンバーの実績工数;</code></p>
+			<p><code>※if(!(期間を選択)) return プロジェクト全体の工数;</code></p>
+		</div>
+		<!-- Content Row -->
+		<!-- UserNameがありの時、ここに表示される -->
+		<div th:if="${not #lists.isEmpty(checkTaskListWithUserName)}">
+			<div class="row">
+				<div class="col-md-12">
+					<table class="table table-hover">
+						<thead>
+							<tr>
+								<th scope="col" width="3%">#</th>
+								<th scope="col" width="28%">タスク</th>
+								<th scope="col" width="10%">予定工数</th>
+								<th scope="col" width="10%">実績工数</th>
+								<th scope="col" width="10%">予実の差</th>
+								<th scope="col" width="15%">開始日</th>
+								<th scope="col" width="15%">終了日</th>
+								<th scope="col" width="9%">担当</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="task, status : ${checkTaskListWithUserName}" th:object="${task}">
+								<th scope="row" id="rowId" th:text="${status.index} + 1">100</th>
+								<td class="taskName" th:text="*{taskName}">ログイン機能実装</td>
+								<td class="expectedManPower" th:text="*{expectedManPower}">2人日</td>
+								<td class="actualManPower" th:text="*{actualManPower}">2.2人日</td>
+								<td class="actualManPower">
+									<span th:if="*{diffExAc lt 0}" style="color:red;"><th:block th:text="*{diffExAc}" /></span>
+									<span th:if="*{diffExAc ge 0}"><th:block th:text="*{diffExAc}" /></span>
+								</td>
+								<td class="startDate" th:text="*{startDate}">2020-05-23</td>
+								<td class="endDate" th:text="*{endDate}">2020-05-25</td>
+								<td class="userName" th:text="*{userName}">森下</td>
+							</tr>
+						</tbody>
+					</table>
+					<canvas id="myBar2Chart"></canvas>
+					<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>
+					<script type="text/javascript" th:inline="javascript">
+					var ctx = document.getElementById("myBar2Chart");
+					var myBar2Chart = new Chart(ctx, {
+					  //グラフの種類
+					  type: 'bar',
+					  //データの設定
+					  data: {
+					      //データ項目のラベル
+					      labels: /*[[ ${taskNameList} ]]*/,
+					      //データセット
+					      datasets: [
+					          {
+					              //凡例
+					              label: "予定工数",
+					              //背景色
+					              backgroundColor: "rgba(179,181,198,0.2)",
+					              //枠線の色
+					              borderColor: "rgba(179,181,198,1)",
+					              //枠線の太さ
+					              borderWidth: 1,
+					              //背景色（ホバーしたときに）
+					              hoverBackgroundColor: "rgba(179,181,198,0.4)",
+					              //枠線の色（ホバーしたときに）
+					              hoverBorderColor: "rgba(179,181,198,1)",
+					              //グラフのデータ
+					              data: /*[[ ${expectedManPowerList} ]]*/,
+					          },
+					          {
+					              //凡例
+					              label: "実績工数",
+					              //背景色
+					              backgroundColor: "rgba(255,99,132,0.2)",
+					              //枠線の色
+					              borderColor: "rgba(255,99,132,1)",
+					              //枠線の太さ
+					              borderWidth: 1,
+					              //背景色（ホバーしたときに）
+					              hoverBackgroundColor: "rgba(255,99,132,0.4)",
+					              //枠線の色（ホバーしたときに）
+					              hoverBorderColor: "rgba(255,99,132,1)",
+					              //グラフのデータ
+					              data: /*[[ ${actualManPowerList} ]]*/,
+					          }
+					      ]
+					  },
+					  //オプションの設定
+					  options: {
+					      //軸の設定
+					      scales: {
+					          //縦軸の設定
+					          yAxes: [{
+					              //目盛りの設定
+					              ticks: {
+					                  //開始値を0にする
+					                  beginAtZero:true,
+					              }
+					          }]
+					      },
+					      //ホバーの設定
+					      hover: {
+					          //ホバー時の動作（single, label, dataset）
+					          mode: 'single'
+					      }
+					  }
+					});
+					    </script> 
+				</div>
+			</div>
+		</div>
+		<!-- /.row -->
+		<!-- Content Row -->
+		<!-- UserNameがなしの時、ここに表示される -->
+		<div th:if="${not #lists.isEmpty(checkTaskList)}">
+			<div class="row">
+				<div class="col-md-12">
+					<canvas id="chartWithoutUserName"></canvas>
+					<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>
+					<script type="text/javascript" th:inline="javascript">
+					var ctx = document.getElementById("chartWithoutUserName");
+					var myBarChart = new Chart(ctx, {
+						  type: "bar",
+						  data:{
+						    labels:　/*[[ ${userNameList} ]]*/,
+						    datasets:[{
+						      label: "各メンバーの実績工数",
+						      data:/*[[ ${totalActualManPowerList} ]]*/
+						    }]
+						  },
+						  options:{}
+					});
+					    </script> 
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- /.container -->
+	<!-- Bootstrap core JavaScript -->
+	<script src="js/index.js"></script>
+	<script
+		src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script
+		src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+	<script
+		src="https://ajax.googleapis.com/ajax/libs/jqueryui/1/i18n/jquery.ui.datepicker-ja.min.js"></script>
+	<script>
+        $(function() {
+          var from1 = $("#startDate").datepicker({
+        	    dateFormat:　"yy-mm-dd",
+                onSelect: function(selectedDate) {
+                  $("#endDate").datepicker("option","minDate",selectedDate);
+                }
+            });
+          var to1 = $("#endDate").datepicker({
+        	  	  dateFormat:　"yy-mm-dd",
+                  onSelect: function(selectedDate ) {
+                  $("#startDate").datepicker("option","maxDate",selectedDate);
+                }
+            });
+        });
+        </script>
+</body>
+
+</html>

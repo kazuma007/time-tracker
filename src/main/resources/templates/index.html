@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Time Tracker</title>
+    <!-- Bootstrap core CSS -->
+    <link href="vendor/bootstrap/css/bootstrap.min.css" th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="css/small-business.css" th:href="@{/css/small-business.css}" rel="stylesheet">
+    <link href="css/styles.css"  th:href="@{/css/styles.css}" rel="stylesheet">
+    <link href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+    <script type="text/javascript" th:inline="javascript">
+        $(document).on("click", "#add", function () {
+            let i = document.getElementById("nextRowId").value;
+            i++;
+            $('#rowId').text(i);
+            $("#rowId").val(i);
+            $('#addElm').clone().insertBefore($('#insertHere')).attr("id", "addElm" + i).css('display', 'table-row');
+            $('#addElm' + i).children('form').attr("id", "my_form" + i);
+            $('#addElm' + i).children('td').children('input').attr("form", "my_form" + i);
+            $('#addElm' + i).children('td').children('button').attr("form", "my_form" + i);
+            $('#nextRowId').val(i);
+            $('.start').datepicker({
+                dateFormat: "yy-mm-dd",
+                onSelect: function (selectedDate) {
+                    $(this).parent().children('.end').datepicker("option", "minDate", selectedDate);
+                }
+            });
+            $('.end').datepicker({
+                dateFormat: "yy-mm-dd",
+                onSelect: function (selectedDate) {
+                    $(this).parent().children('.start').datepicker("option", "maxDate", selectedDate);
+                }
+            });
+        });
+        $(document).on("click", ".modify", function () {            
+            const target = $(this);
+            const taskId = target.parent().parent().children('.deleteBtn').children('input').val();
+            console.log(taskId);
+            const baselink = /*[[@{/editTask}]]*/'';
+            const link = baselink + "?taskId=" + taskId;
+            console.log(link);
+            const rowId = target.parent().parent().children('#rowId').text();
+            const taskName = target.parent().parent().children('.taskName').text();
+            let expectedManPower = target.parent().parent().children('.expectedManPower').text();
+            expectedManPower = Number(expectedManPower.replace('人日', ''));
+            let actualManPower = target.parent().parent().children('.actualManPower').text();
+            actualManPower = Number(actualManPower.replace('人日', ''));
+            const startDate = target.parent().parent().children('.startDate').text();
+            const endDate = target.parent().parent().children('.endDate').text();
+            const userName = target.parent().parent().children('.userName').text();
+            target.parent().parent().prepend('<form action="' + link + '" method="post" id="my_form' + rowId + '"></form>');
+            target.parent().parent().children('.taskName').html('<input type="text" name="taskName" form="my_form' + rowId + '" style="width:100%;" required/>');
+            target.parent().parent().children('.expectedManPower').html('<input type="text" pattern="\\d+(\\.\\d+)?" name="expectedManPower" form="my_form' + rowId + '" style="width:60%;" required/>人日');
+            target.parent().parent().children('.actualManPower').html('<input type="text" pattern="\\d+(\\.\\d+)?" name="actualManPower" form="my_form' + rowId + '" style="width:60%;" required/>人日');
+            target.parent().parent().children('.startDate').html('<input type="text" name="startDate" form="my_form' + rowId + '" class="start" style="width:100%;" required onkeypress="return false;"/>');
+            target.parent().parent().children('.endDate').html('<input type="text" name="endDate" form="my_form' + rowId + '" class="end" style="width:100%;" required onkeypress="return false;"/>');
+            target.parent().parent().children('.userName').html('<input type="text" name="userName" form="my_form' + rowId + '" style="width:100%;" required/>');
+            target.parent().parent().children('.taskName').children().val(taskName);
+            target.parent().parent().children('.expectedManPower').children().val(expectedManPower);
+            target.parent().parent().children('.actualManPower').children().val(actualManPower);
+            target.parent().parent().children('.startDate').children().val(startDate);
+            target.parent().parent().children('.endDate').children().val(endDate);
+            target.parent().parent().children('.userName').children().val(userName);
+            target.parent().html('<button type="submit" form="my_form' + rowId + '" class="btn btn-primary rounded-pill">保存</button>');
+            $('.start').datepicker({
+                dateFormat:　"yy-mm-dd",
+                onSelect: function (selectedDate) {
+                    $(this).parent().children('.end').datepicker("option", "minDate", selectedDate);
+                }
+            });
+            $('.end').datepicker({
+                dateFormat:　"yy-mm-dd",
+                onSelect: function (selectedDate) {
+                    $(this).parent().children('.start').datepicker("option", "maxDate", selectedDate);
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#" th:href="@{/}">Time Tracker</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive"
+                aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" th:href="@{/}">プロジェクト
+                        </a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="#" th:href="@{/task}">工数入力
+                        	<span class="sr-only">(current)</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" th:href="@{/check}">工数確認</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+        <div class="add-task-button-area">
+            <button type="button" id="add" class="btn page-link text-dark d-inline-block">タスク追加</button>
+        </div>
+        <!-- Content Row -->
+        <div class="row">
+            <div class="col-md-12">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col" width="3%">#</th>
+                            <th scope="col" width="25%">タスク</th>
+                            <th scope="col" width="12%">予定工数</th>
+                            <th scope="col" width="12%">実績工数</th>
+                            <th scope="col" width="12%">開始日</th>
+                            <th scope="col" width="12%">終了日</th>
+                            <th scope="col" width="8%">担当</th>
+                            <th scope="col" width="8%"></th>
+                            <th scope="col" width="8%"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr id="addElm" style="display: none;">
+                        <form th:action="@{/addTask}" method="post" id="my_form"></form>
+                            <th scope="row" id="rowId"></th>
+                            <td class="taskName"><input type="text" name="taskName" form="my_form" style="width:100%" required/></td>
+                            <td class="expectedManPower"><input type="text" pattern="\d+(\.\d+)?" form="my_form" name="expectedManPower" style="width:60%" required/>人日</td>
+                            <td class="actualManPower"><input type="text" form="my_form" pattern="\d+(\.\d+)?" name="actualManPower" style="width:60%" required/>人日</td>
+                            <td class="startDate"><input type="text" form="my_form" name="startDate" class="start" style="width:100%" required onkeypress="return false;"/></td>
+                            <td class="endDate"><input type="text" form="my_form" name="endDate" class="end" style="width:100%" required onkeypress="return false;"/></td>
+                            <td class="userName"><input type="text" form="my_form" name="userName" style="width:100%" required/></td>
+                            <td class="modifyBtn"><button type="submit" class="btn btn-primary rounded-pill" form="my_form">追加</button></td>
+                            <td class="deleteBtn"><a href="#" th:href="@{/deleteTask(taskId=*{taskId})}"><button type="button" class="btn btn-warning rounded-pill" form="my_form">削除</button></a></td>
+                        </tr>
+                        <tr th:each="task, status : ${session.taskList}" th:object="${task}">
+                            <th scope="row" id="rowId" th:text="${status.index} + 1">100</th>
+                            <td class="taskName" th:text="*{taskName}">ログイン機能実装</td>
+                            <td class="expectedManPower" th:text="*{expectedManPower}">2人日</td>
+                            <td class="actualManPower" th:text="*{actualManPower}">2.2人日</td>
+                            <td class="startDate" th:text="*{startDate}">2020-05-23</td>
+                            <td class="endDate" th:text="*{endDate}">2020-05-25</td>
+                            <td class="userName" th:text="*{userName}">森下</td>
+                            <td class="modifyBtn"><button class="btn btn-success rounded-pill modify">修正</button></td>
+                            <td class="deleteBtn"><input type="hidden" th:value="*{taskId}"><a href="#" th:href="@{/deleteTask(taskId=*{taskId})}"><button type="button" class="btn btn-warning rounded-pill">削除</button></a></td>
+                        </tr>
+                        <tr id="insertHere" style="display: none;">
+                            <td><input type="text" id="nextRowId" value="0" th:value="${#lists.size(session.taskList)}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div style="padding-top: 300px"></div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container -->
+    <!-- Bootstrap core JavaScript -->
+    <script src="js/index.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1/i18n/jquery.ui.datepicker-ja.min.js"></script>
+</body>
+
+</html>

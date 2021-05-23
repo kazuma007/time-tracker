@@ -1,0 +1,14 @@
+mysql> show columns from task;
++------------------+--------------+------+-----+---------+----------------+
+| Field            | Type         | Null | Key | Default | Extra          |
++------------------+--------------+------+-----+---------+----------------+
+| taskId           | int          | NO   | MUL | NULL    | auto_increment |
+| taskName         | varchar(100) | YES  |     | NULL    |                |
+| expectedManPower | double       | YES  |     | NULL    |                |
+| actualManPower   | double       | YES  |     | NULL    |                |
+| startDate        | varchar(100) | YES  |     | NULL    |                |
+| endDate          | varchar(100) | YES  |     | NULL    |                |
+| userName         | varchar(100) | YES  |     | NULL    |                |
+| projectId        | int          | YES  |     | NULL    |                |
++------------------+--------------+------+-----+---------+----------------+
+8 rows in set (0.00 sec)

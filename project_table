@@ -1,0 +1,11 @@
+mysql> show columns from project;
++-------------+--------------+------+-----+---------+----------------+
+| Field       | Type         | Null | Key | Default | Extra          |
++-------------+--------------+------+-----+---------+----------------+
+| projectId   | int          | NO   | MUL | NULL    | auto_increment |
+| projectName | varchar(100) | YES  |     | NULL    |                |
+| content     | varchar(300) | YES  |     | NULL    |                |
+| date        | varchar(50)  | YES  |     | NULL    |                |
+| projectCode | varchar(255) | YES  | UNI | NULL    |                |
++-------------+--------------+------+-----+---------+----------------+
+5 rows in set (0.01 sec)

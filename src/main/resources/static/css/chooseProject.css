@@ -1,0 +1,14 @@
+.title h2 {
+    padding: 0.25em 0.5em;/*ã‰º ¶‰E‚Ì—]”’*/
+    color: black;/*•¶šF*/
+    background: transparent;/*”wŒi“§–¾‚É*/
+    border-left: solid 5px #7db4e6;/*¶ü*/
+  }
+
+.title {
+    padding-top: 75px;
+}
+
+.project-padding {
+    padding-top: 50px;
+}
